@@ -76,10 +76,11 @@
         }
       } catch (e) {
         console.error("Error de acceso en el panel:", e);
+        var detail = e && e.message ? e.message : "Error desconocido.";
         login(
           otp
-            ? "No se pudo verificar el código. Inténtalo de nuevo o solicita otro."
-            : "No se pudo enviar el código. Revisa la conexión y la configuración de autenticación de Supabase.",
+            ? "No se pudo verificar el código: " + detail
+            : "No se pudo enviar el código: " + detail,
           otp,
         );
       }
