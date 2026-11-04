@@ -52,23 +52,36 @@
       "</button></div>";
     $("b").onclick = async function () {
       var v = $("i").value.trim();
-      if (!v) return;
-      if (!otp) {
-        email = v.toLowerCase();
-        var r = await sb.auth.signInWithOtp({
-          email: email,
-          options: { shouldCreateUser: true },
-        });
-        if (r.error) return login("No se pudo enviar el código.");
-        login("Te he enviado un código a " + email, 1);
-      } else {
-        var r2 = await sb.auth.verifyOtp({
-          email: email,
-          token: v,
-          type: "email",
-        });
-        if (r2.error) return login("Código incorrecto o caducado.", 1);
-        boot();
+      var button = $("b");
+      if (!v) return login("Escribe tu email para continuar.", otp);
+      button.disabled = true;
+      button.textContent = otp ? "Verificando…" : "Enviando…";
+      try {
+        if (!otp) {
+          email = v.toLowerCase();
+          var r = await sb.auth.signInWithOtp({
+            email: email,
+            options: { shouldCreateUser: true },
+          });
+          if (r.error) throw r.error;
+          login("Te he enviado un código a " + email, 1);
+        } else {
+          var r2 = await sb.auth.verifyOtp({
+            email: email,
+            token: v.replace(/\s/g, ""),
+            type: "email",
+          });
+          if (r2.error) throw r2.error;
+          boot();
+        }
+      } catch (e) {
+        console.error("Error de acceso en el panel:", e);
+        login(
+          otp
+            ? "No se pudo verificar el código. Inténtalo de nuevo o solicita otro."
+            : "No se pudo enviar el código. Revisa la conexión y la configuración de autenticación de Supabase.",
+          otp,
+        );
       }
     };
   }
