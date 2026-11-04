@@ -45,7 +45,7 @@
       esc(msg || "Escribe tu email para entrar.") +
       '</p><input id="i" ' +
       (otp
-        ? 'inputmode="numeric" autocomplete="one-time-code" placeholder="Código de 6 dígitos"'
+        ? 'inputmode="numeric" autocomplete="one-time-code" placeholder="Código de 8 dígitos"'
         : 'type="email" placeholder="tu@email.com"') +
       '><button id="b">' +
       (otp ? "Entrar" : "Enviar código") +

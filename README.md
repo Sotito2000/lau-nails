@@ -17,7 +17,7 @@
 Funciona en cualquier alojamiento estático (Netlify, Vercel, GitHub Pages...): sube la carpeta entera. Para probarla en local, abre `index.html` en el navegador.
 
 ## Acceso de clientas (login con invitación personal)
-Cada clienta entra con **su email + un código de 6 dígitos que le llega al correo** y, la primera vez, con un **código de invitación personal de un solo uso** que le da Laura. Un código ya usado no sirve para nadie más; solo hay **una sesión activa por clienta** (si entra desde otro dispositivo, el anterior se cierra) y Laura puede **desactivar** o **cerrar la sesión** de cualquiera.
+Cada clienta entra con **su email + un código de 8 dígitos que le llega al correo** y, la primera vez, con un **código de invitación personal de un solo uso** que le da Laura. Un código ya usado no sirve para nadie más; solo hay **una sesión activa por clienta** (si entra desde otro dispositivo, el anterior se cierra) y Laura puede **desactivar** o **cerrar la sesión** de cualquiera.
 El contenido privado (servicios, galería, enlace de reservas) **no está en los archivos de la web**: sale de la base de datos y solo se entrega tras el login.
 
 ### Puesta en marcha (una sola vez)

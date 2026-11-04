@@ -1,4 +1,4 @@
-/* Lau Nails · acceso de clientas (email + código de 6 dígitos + invitación personal de un solo uso) */
+/* Lau Nails · acceso de clientas (email + código OTP + invitación personal de un solo uso) */
 (function () {
   var C = window.LN_CONFIG || {},
     demo = !(C.SUPABASE_URL && C.SUPABASE_ANON_KEY),
@@ -44,12 +44,12 @@
     );
     lab.textContent = {
       email: "Email",
-      otp: "Código de 6 dígitos",
+      otp: "Código de 8 dígitos",
       invite: "Código de invitación",
     }[s];
     inp.placeholder = {
       email: "tu@email.com",
-      otp: "123456",
+      otp: demo ? "123456" : "12345678",
       invite: "XXXX-XXXX",
     }[s];
     alt.hidden = s === "email";
@@ -208,7 +208,7 @@
         });
         if (r.error) throw r.error;
         say(
-          "Te he enviado un código de 6 dígitos a " +
+          "Te he enviado un código de 8 dígitos a " +
             email +
             ". Mira también el spam.",
         );
