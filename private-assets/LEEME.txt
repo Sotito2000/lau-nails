@@ -1,0 +1,1 @@
+Sube aquí el vídeo y las fotos de los trabajos de Lau. NO se publican con la web: se suben a Supabase → Storage → bucket 'gallery' (privado).

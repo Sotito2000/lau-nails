@@ -1,40 +1,36 @@
-# Lau Nails · web
+# Lau Nails · web con acceso privado
 
 ## Estructura
-- `index.html` · contenido de la página
-- `css/styles.css` · estilos (colores y tipografías al principio, en `:root`)
-- `js/main.js` · animación de la puerta, zoom y entrada de textos al hacer scroll
-- `images/` · `door.jpg` (puerta entera), `leaf-left.webp` y `leaf-right.webp` (las dos hojas que se abren), `hand.webp` (mano colgando), `chains.webp`, `padlock-closed.webp` y `padlock-open.webp` (candado y cadenas del login), `nail-video.mp4`, y la carpeta `gallery/` para fotos nuevas
+- `public/` → **lo único que se publica** (`index.html`, `admin.html`, `css/`, `js/`, `images/`). Vercel lo sirve gracias a `vercel.json` (`outputDirectory`).
+- `supabase/` → SQL de la base de datos (**no se publica**): `schema.sql`, `seed-content.sql`, `patch-02-hardening.sql`.
+- `private-assets/` → vídeo y fotos de trabajos antes de subirlos a Supabase Storage (**no se publica**).
+- `vercel.json` → cabeceras de seguridad (CSP, anti-clickjacking…) y caché.
+
+## Tras desplegar, comprueba que esto da 404
+`/supabase/seed-content.sql` · `/private-assets/nail-video.mp4` · `/README.md` · `/js/demo-interior.js`. Si alguno se descarga, algo está publicado de más.
+
+## Ajustes en Supabase (checklist de seguridad)
+1. **SQL Editor**: ejecuta `supabase/patch-02-hardening.sql` (una vez).
+2. **Authentication → Providers → Email**: caducidad del código (*OTP expiry*) a **600** segundos (10 min).
+3. **Authentication → URL Configuration**: *Site URL* = `https://lau-nails.vercel.app` y la misma en *Redirect URLs*. No añadas comodines (`*`).
+4. **Authentication → SMTP**: correo propio (Brevo/Resend) con un dominio que tengas. Sin esto el correo no llega a clientas reales y puede caer en spam.
+5. **Authentication → Attack Protection → CAPTCHA** (recomendado): ver abajo.
+6. **Storage → gallery**: sube `private-assets/nail-video.mp4` y las fotos de los trabajos (bucket privado).
+7. En la cuenta de Gmail de Lau (`lau.nails013@gmail.com`) activa la **verificación en dos pasos**: quien controle ese correo controla el panel.
+
+### Activar el CAPTCHA (Cloudflare Turnstile, gratis)
+1. En [dash.cloudflare.com](https://dash.cloudflare.com) → *Turnstile* → *Add widget* con el dominio `lau-nails.vercel.app`. Te da una **site key** (pública) y una **secret key** (privada).
+2. Supabase → *Authentication → Attack Protection* → activa CAPTCHA, elige *Turnstile* y pega la **secret key**.
+3. Pega la **site key** en `public/js/config.js` (`TURNSTILE_SITEKEY`) y vuelve a desplegar. Hay que hacer **los dos pasos a la vez**: si solo activas uno, nadie podrá entrar.
+
+### (Opcional) Librería de Supabase en tu propio dominio
+Descarga `https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js`, guárdala como `public/js/vendor/supabase.js`, pon `SUPABASE_JS: "js/vendor/supabase.js"` en `config.js` y quita `https://cdn.jsdelivr.net` del `script-src` de `vercel.json`.
+
+## Uso diario
+`/admin` → entra con el email de Lau (llega un código) → nombre de la clienta → *Crear código* → *Abrir WhatsApp*. Desde ahí ves quién tiene acceso y puedes desactivar o cerrar sesión.
 
 ## Tareas habituales
-- **Añadir fotos a la galería:** copia la foto a `images/gallery/` y añade una línea en `index.html` (hay un ejemplo en un comentario sobre `<div class="gal">`).
-- **Cambiar la mano o el candado:** sustituye los archivos de `images/` por otros con fondo transparente. Si cambia la proporción de la mano, ajusta `aspect-ratio` en `.hand`; el punto donde cuelga del borde es el `translateY(-50%)` de `.hl` / `.hr`. Los dos candados deben tener el mismo tamaño y el cuerpo en el mismo sitio.
-- **Cambiar la puerta:** hay que sustituir `door.jpg` y recortar de nuevo `leaf-left.webp` y `leaf-right.webp` (las hojas, con transparencia). Si la puerta no está en el mismo sitio que ahora, ajusta las posiciones en porcentaje de `.lf`, `.rt` y `.opn` en `styles.css` y las constantes `.4628` y `.6667` de `main.js`.
-- **Reservas:** el enlace de Cal.com está en `index.html` (`id="cal"`). Cámbialo cuando Laura tenga su cuenta.
-- **Contacto:** WhatsApp +34 641 03 72 05 · Instagram @lau_nails013 · TikTok @laury.rodrigz (pie de página y sección de reservas).
-
-## Publicarla
-Funciona en cualquier alojamiento estático (Netlify, Vercel, GitHub Pages...): sube la carpeta entera. Para probarla en local, abre `index.html` en el navegador.
-
-## Acceso de clientas (login con invitación personal)
-Cada clienta entra con **su email + un código de 8 dígitos que le llega al correo** y, la primera vez, con un **código de invitación personal de un solo uso** que le da Laura. Un código ya usado no sirve para nadie más; solo hay **una sesión activa por clienta** (si entra desde otro dispositivo, el anterior se cierra) y Laura puede **desactivar** o **cerrar la sesión** de cualquiera.
-El contenido privado (servicios, galería, enlace de reservas) **no está en los archivos de la web**: sale de la base de datos y solo se entrega tras el login.
-
-### Puesta en marcha (una sola vez)
-1. Crea un proyecto en [supabase.com](https://supabase.com) (plan gratuito).
-2. **SQL Editor** → pega y ejecuta `supabase/schema.sql` entero.
-3. **Authentication → Email**: activa el acceso por código y edita la plantilla *Magic Link* para que incluya el código: `Tu código de acceso: {{ .Token }}`.
-4. **Authentication → SMTP**: configura un correo propio (Resend, Brevo...). El correo integrado de Supabase tiene un límite muy bajo y no sirve para clientas reales.
-5. **Authentication → Attack protection**: activa CAPTCHA (Turnstile/hCaptcha) para evitar registros masivos.
-6. **Project Settings → API**: copia la *Project URL* y la clave *anon* a `js/config.js`.
-7. **Storage → gallery**: sube `nail-video.mp4` y las fotos de la galería (el bucket es privado).
-8. **SQL Editor**: ejecuta `supabase/seed-content.sql` (contenido privado y enlace de reservas de Laura).
-9. Abre `admin.html`, entra con el email de Laura (llega un código) y luego, en el SQL Editor: `insert into public.admins select id from auth.users where email = 'lau.nails013@gmail.com';`
-10. **Borra `js/demo-interior.js`** y su línea `<script>` en `index.html` (es solo para el modo demo).
-11. Sube la carpeta a un alojamiento estático (Cloudflare Pages, Netlify...) y en Supabase → Authentication → URL Configuration pon la dirección de la web.
-
-### Uso diario
-En `admin.html`: escribe el nombre de la clienta → *Crear código* → *Abrir WhatsApp* (el mensaje sale redactado) y se lo envías. Ahí mismo ves quién tiene acceso, su último acceso, y puedes desactivar o cerrar sesión.
-
-### Modo demo
-Mientras `js/config.js` tenga `SUPABASE_URL` vacío, la web funciona en modo demo **sin seguridad real**: email cualquiera, código `123456`, invitación `DEMO-1234`. Sirve solo para ver el diseño.
+- **Fotos o vídeos de la galería:** súbelos a Supabase → Storage → `gallery` y añade el tile en el HTML de `supabase/seed-content.sql` con `data-private="nombre.jpg"` (fotos: `<div class="g ph" data-private="foto1.jpg"><span>Título</span></div>`); vuelve a ejecutar ese SQL.
+- **Precios, textos o enlace de Cal.com:** edita `supabase/seed-content.sql` y vuelve a ejecutarlo (el enlace va en `booking_url`).
+- **Mano o candado:** sustituye los archivos de `public/images/` por otros con fondo transparente (mismo nombre). Si cambia la proporción de la mano, ajusta `aspect-ratio` en `.hand`.
+- **Puerta:** hay que cambiar `door.jpg`, `leaf-left.webp` y `leaf-right.webp` y reajustar los porcentajes de `.lf`, `.rt`, `.opn` y las constantes `.4628` y `.6667` de `main.js`.

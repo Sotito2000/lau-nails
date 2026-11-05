@@ -7,11 +7,20 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <title>Lau Nails · Uñas de gel en Pobla de Vallbona</title>
+    <meta name="description" content="Lau Nails · uñas de gel y nail art en Pobla de Vallbona. Acceso exclusivo para clientas." />
+    <meta name="theme-color" content="#2a0f4a" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Lau Nails · Uñas de gel en Pobla de Vallbona" />
+    <meta property="og:description" content="Uñas de gel y nail art. Acceso exclusivo para clientas." />
+    <meta property="og:image" content="https://lau-nails.vercel.app/images/door.jpg" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%85%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Pinyon+Script&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Pinyon+Script&display=swap"
     />
-    <link rel="preload" as="image" href="images/door.jpg" />
+    <link rel="preload" as="image" href="images/door.jpg" fetchpriority="high" />
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body>
@@ -25,7 +34,7 @@
       <div class="gate-card">
         <div class="gate-logo">Lau Nails</div>
         <h2 id="gt">Acceso para clientas</h2>
-        <p class="gate-msg" id="gmsg">
+        <p class="gate-msg" id="gmsg" role="status" aria-live="polite">
           Escribe tu email y te enviaré un código para entrar.
         </p>
         <form id="gform">
@@ -36,7 +45,7 @@
             autocomplete="email"
             required
             placeholder="tu@email.com"
-          /><button class="btn" id="gbtn" type="submit">Enviar código</button>
+          /><div id="cap" class="cap" hidden></div><button class="btn" id="gbtn" type="submit">Enviar código</button>
         </form>
         <a href="#" class="alt" id="galt" hidden>Usar otro email</a>
         <p class="gate-help">
@@ -62,8 +71,6 @@
 
     <div class="scene" id="scene">
       <div class="stage">
-        <div class="cl k2 far" style="left: 10%; top: 34%"></div>
-        <div class="cl k2 far" style="left: 90%; top: 28%"></div>
         <div class="world" id="world">
           <div class="pic" id="pic">
             <div class="base"></div>
@@ -157,7 +164,6 @@
     </footer>
 
     <script src="js/config.js" defer></script>
-    <script src="js/demo-interior.js" defer></script>
     <script src="js/main.js" defer></script>
     <script src="js/auth.js" defer></script>
   </body>

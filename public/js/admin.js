@@ -26,6 +26,29 @@
   function $(i) {
     return document.getElementById(i);
   }
+  /* anti-bots opcional (Turnstile) */
+  var capToken = null,
+    capId = null;
+  function renderCap() {
+    var box = document.getElementById("cap");
+    if (!C.TURNSTILE_SITEKEY || !box) return;
+    function go() {
+      capId = turnstile.render(box, {
+        sitekey: C.TURNSTILE_SITEKEY,
+        callback: function (t) {
+          capToken = t;
+        },
+        "expired-callback": function () {
+          capToken = null;
+        },
+      });
+    }
+    if (window.turnstile) return go();
+    var t = document.createElement("script");
+    t.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    t.onload = go;
+    document.head.appendChild(t);
+  }
   if (!(C.SUPABASE_URL && C.SUPABASE_ANON_KEY)) {
     app.innerHTML =
       '<div class="card"><h1>Falta configurar</h1><p class="m">Rellena js/config.js con los datos de Supabase.</p></div>';
@@ -33,6 +56,7 @@
   }
   var s = document.createElement("script");
   s.src =
+    C.SUPABASE_JS ||
     "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.112.3/dist/umd/supabase.js";
   s.onload = function () {
     sb = supabase.createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
@@ -47,9 +71,10 @@
       (otp
         ? 'inputmode="numeric" autocomplete="one-time-code" placeholder="Código de 8 dígitos"'
         : 'type="email" placeholder="tu@email.com"') +
-      '><button id="b">' +
+      '><div id="cap" style="margin:0 0 10px"></div><button id="b">' +
       (otp ? "Entrar" : "Enviar código") +
       "</button></div>";
+    if (!otp) renderCap();
     $("b").onclick = async function () {
       var v = $("i").value.trim();
       var button = $("b");
@@ -58,10 +83,12 @@
       button.textContent = otp ? "Verificando…" : "Enviando…";
       try {
         if (!otp) {
+          if (C.TURNSTILE_SITEKEY && !capToken)
+            return login("Confirma que no eres un robot.", 0);
           email = v.toLowerCase();
           var r = await sb.auth.signInWithOtp({
             email: email,
-            options: { shouldCreateUser: true },
+            options: { shouldCreateUser: false, captchaToken: capToken || undefined },
           });
           if (r.error) throw r.error;
           login("Te he enviado un código a " + email, 1);
@@ -116,7 +143,7 @@
     var name = $("n").value.trim();
     if (!name) return;
     var r = await sb.rpc("admin_create_invite", { p_name: name });
-    if (r.error) return alert("No se pudo crear el código.");
+    if (r.error) return alert("No se pudo crear el código: " + (r.error.message || ""));
     var code = r.data,
       msg =
         "Hola " +
