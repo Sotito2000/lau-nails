@@ -158,7 +158,9 @@ nav {
   right: 0;
   text-align: center;
   color: #3b1d6e;
-  font: 400 1.7rem var(--script);
+  font: 700 0.95rem var(--display);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 .hint::after {
   content: "";
@@ -813,9 +815,9 @@ html.locked .stage {
 .pad {
   position: absolute;
   left: 50%;
-  top: 25%;
+  bottom: 4.3%;
   width: 30%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   transition:
     transform 0.9s cubic-bezier(0.55, 0, 0.9, 0.5) 0.55s,
     opacity 0.35s 1.05s;
@@ -842,7 +844,7 @@ html.locked .stage {
   opacity: 1;
 }
 .lock.open .pad {
-  transform: translate(-50%, calc(-50% + 70vh)) rotate(8deg);
+  transform: translate(-50%, 70vh) rotate(8deg);
   opacity: 0;
 }
 .lock.open .chains {

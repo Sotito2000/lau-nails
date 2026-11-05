@@ -116,13 +116,13 @@
   }
 
   /* ---------- contenido privado: se inyecta solo tras el login ---------- */
-  function open(html, url) {
+  function open(html, url, pause) {
+    if (pause == null) pause = 1400; // pausa para ver la puerta cerrada con el candado
     main.innerHTML = html;
     var a = $("cal");
     if (a && /^https:\/\//i.test(url || "")) a.href = url;
     signAssets();
     startWatch();
-    root.classList.remove("locked");
     g.classList.add("out");
     setTimeout(function () {
       g.hidden = true;
@@ -130,12 +130,15 @@
     if (window.lnReveal) window.lnReveal(main);
     scrollTo(0, 0);
     var lk = $("lock");
-    if (lk) {
-      lk.classList.add("open");
-      setTimeout(function () {
-        lk.remove();
-      }, 2400);
-    }
+    setTimeout(function () {
+      root.classList.remove("locked");
+      if (lk) {
+        lk.classList.add("open");
+        setTimeout(function () {
+          lk.remove();
+        }, 2400);
+      }
+    }, pause);
     var col = document.querySelector("footer .f > div:nth-child(2)");
     if (col) {
       var o = document.createElement("a");
@@ -285,7 +288,7 @@
     var t = localStorage.getItem(TOK);
     if (t) {
       var r = (await sb.rpc("get_private", { p_token: t })).data;
-      if (r && r.ok) return open(r.html, r.booking_url);
+      if (r && r.ok) return open(r.html, r.booking_url, 700);
       if (r && r.reason === "session") {
         await signOutLocal();
         say("Tu acceso se ha abierto en otro dispositivo. Vuelve a entrar.", 1);
